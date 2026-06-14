@@ -1,7 +1,0 @@
-[
-  { "item": "NVIDIA RTX 5090", "price": 215000, "status": "In Stock" },
-  { "item": "NVIDIA RTX 5080", "price": 175000, "status": "In Stock" },
-  { "item": "NVIDIA RTX 5070 Ti", "price": 120000, "status": "Out of Stock" },
-  { "item": "AMD Ryzen 9 9950X", "price": 95000, "status": "In Stock" },
-  { "item": "ASUS TUF 1440p Monitor", "price": 45000, "status": "In Stock" }
-]

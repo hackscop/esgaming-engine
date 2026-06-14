@@ -1,0 +1,12 @@
+{
+  "inventory": [
+    { "category": "GPU", "name": "RTX 5090 32GB", "price": 1599, "inStock": true },
+    { "category": "GPU", "name": "RTX 5080 16GB", "price": 1199, "inStock": true },
+    { "category": "GPU", "name": "RTX 5070 Ti 12GB", "price": 799, "inStock": false },
+    { "category": "CPU", "name": "Ryzen 9 9950X", "price": 649, "inStock": true },
+    { "category": "CPU", "name": "Ryzen 7 9800X3D", "price": 479, "inStock": true },
+    { "category": "Console", "name": "PlayStation 5 Pro", "price": 699, "inStock": true },
+    { "category": "Monitor", "name": "27-inch WOLED Monitor", "price": 799, "inStock": true }
+  ],
+  "market_notes": "Storage and RAM prices are currently highly volatile and expensive due to the global storage crisis. Warn users when they ask for custom builds."
+}
