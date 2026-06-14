@@ -33,7 +33,6 @@
                 border-radius: 0;
                 border: none;
             }
-            #es-widget-btn { display: none; /* Hide button when open */ }
         }
 
         #es-chat-header {
