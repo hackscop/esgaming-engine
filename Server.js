@@ -19,9 +19,9 @@ mongoose.connect(process.env.MONGODB_URI)
 const chatSchema = new mongoose.Schema({ user: String, ai: String });
 const ChatLog = mongoose.model('ChatLog', chatSchema);
 
-// FIXED AI INITIALIZATION (BYPASSES 404 ERROR)
+// THE FIX: Universal Base Model
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
+const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
 
 // ROUTES
 app.get('/', (req, res) => {
@@ -33,7 +33,6 @@ app.post('/api/chat', async (req, res) => {
         const userMessage = req.body.prompt;
         if (!userMessage) return res.status(400).json({ error: "Prompt is required" });
 
-        // BULLETPROOF INVENTORY CHECK
         let rawInventory = "Inventory list currently unavailable.";
         try {
             const lowerPath = path.join(__dirname, 'inventory.json');
@@ -59,7 +58,6 @@ app.post('/api/chat', async (req, res) => {
         const result = await chatSession.sendMessage(hiddenContext);
         const responseText = result.response.text();
 
-        // Save real user message to Database
         try {
             await new ChatLog({ user: userMessage, ai: responseText }).save();
         } catch (dbErr) {
@@ -75,6 +73,6 @@ app.post('/api/chat', async (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`==========================================`);
-    console.log(`SERVER RUNNING - NEW MODEL & INVENTORY SYS`);
+    console.log(`SERVER RUNNING - UNIVERSAL GEMINI-PRO MODEL`);
     console.log(`==========================================`);
 });
