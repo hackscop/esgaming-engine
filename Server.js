@@ -19,9 +19,10 @@ mongoose.connect(process.env.MONGODB_URI)
 const chatSchema = new mongoose.Schema({ user: String, ai: String });
 const ChatLog = mongoose.model('ChatLog', chatSchema);
 
-// 2. AI CONFIGURATION
+// 2. AI CONFIGURATION - THE ACTUAL FIX
+// Using the active 2.5 Flash model instead of the deprecated 1.5 version.
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
 // 3. ROUTES
 app.get('/', (req, res) => {
@@ -43,11 +44,10 @@ app.post('/api/chat', async (req, res) => {
         } catch (e) { console.error("File Read Error", e); }
         
         // The Payload
-        const prompt = `You are the ESGaming Architect. Answer the user based ONLY on this current store inventory.
+        const prompt = `You are the ESGaming Architect. Answer the user based ONLY on this current store inventory. Remember that custom build storage and RAM prices are currently highly volatile due to the global storage crisis.
         STORE DATA: ${rawInventory}
         USER'S MESSAGE: "${userMessage}"`;
 
-        // THE FIX: generateContent bypasses the 404 endpoint bug
         const result = await model.generateContent(prompt);
         const responseText = result.response.text();
 
@@ -63,6 +63,6 @@ app.post('/api/chat', async (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`==========================================`);
-    console.log(`DEPLOYMENT TRACKER: V-999 (FINAL FIX)`);
+    console.log(`SERVER RUNNING - GEMINI 2.5 FLASH ACTIVE`);
     console.log(`==========================================`);
 });
