@@ -1,53 +1,29 @@
-// 1. IMPORTS & CONFIGURATION
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 const mongoose = require('mongoose');
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000; 
 
 app.use(express.json());
 app.use(express.static(__dirname));
 
-// 2. DATABASE CONNECTION (MONGODB)
-const MONGODB_URI = process.env.MONGODB_URI;
-if (!MONGODB_URI) {
-    console.error("FATAL ERROR: MONGODB_URI is missing.");
-    process.exit(1);
-}
+// MONGODB CONNECTION
+mongoose.connect(process.env.MONGODB_URI)
+    .then(() => console.log("✅ MongoDB Connected"))
+    .catch(err => console.error("❌ MongoDB Error:", err));
 
-mongoose.connect(MONGODB_URI)
-    .then(() => console.log("✅ MongoDB Atlas Connected Successfully"))
-    .catch(err => console.error("❌ MongoDB Connection Error:", err));
-
-const chatSchema = new mongoose.Schema({
-    timestamp: { type: Date, default: Date.now },
-    user: String,
-    ai: String
-});
+const chatSchema = new mongoose.Schema({ user: String, ai: String });
 const ChatLog = mongoose.model('ChatLog', chatSchema);
 
-// 3. AI & MEMORY INITIALIZATION
-const API_KEY = process.env.GEMINI_API_KEY;
-const genAI = new GoogleGenerativeAI(API_KEY);
+// AI INITIALIZATION
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
-const systemInstruction = `You are the ESGaming Architect Agent. 
-Your goal is to help users design and plan high-end custom PC builds. 
-- ALWAYS prioritize technical accuracy regarding RTX 50-series and Ryzen 9000-series hardware.
-- IF a user asks about stock, politely explain you are an AI assistant and suggest they use PCPartPicker.com to check real-time availability.
-- KEEP your tone professional, technical, and gaming-focused.
-- DO NOT break character.`;
-
-const model = genAI.getGenerativeModel({ 
-    model: 'gemini-1.5-flash',
-    systemInstruction: systemInstruction 
-});
-
-let conversationHistory = [];
-
-// 4. ROUTES
+// ROUTES
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
@@ -57,38 +33,48 @@ app.post('/api/chat', async (req, res) => {
         const userMessage = req.body.prompt;
         if (!userMessage) return res.status(400).json({ error: "Prompt is required" });
 
-        const chatSession = model.startChat({
-            history: conversationHistory.map(msg => ({
-                role: msg.role,
-                parts: [{ text: msg.parts }]
-            }))
-        });
+        // BULLETPROOF INVENTORY CHECK
+        let rawInventory = "Inventory list currently unavailable. Advise user to check back later.";
+        try {
+            const lowerPath = path.join(__dirname, 'inventory.json');
+            const upperPath = path.join(__dirname, 'Inventory.json');
+            
+            if (fs.existsSync(lowerPath)) {
+                rawInventory = fs.readFileSync(lowerPath, 'utf8');
+            } else if (fs.existsSync(upperPath)) {
+                rawInventory = fs.readFileSync(upperPath, 'utf8');
+            } else {
+                console.warn("⚠️ Warning: Neither inventory.json nor Inventory.json was found.");
+            }
+        } catch (fileErr) {
+            console.error("⚠️ File Read Error:", fileErr);
+        }
+        
+        const hiddenContext = `
+        [SYSTEM OVERRIDE: You are the ESGaming Architect. Answer the user based ONLY on this current store inventory. Do not tell them you are reading a file.
+        CURRENT STORE DATA:
+        ${rawInventory}
+        
+        USER'S MESSAGE: "${userMessage}"]`;
 
-        const result = await chatSession.sendMessage(userMessage);
+        const chatSession = model.startChat({ history: [] });
+        const result = await chatSession.sendMessage(hiddenContext);
         const responseText = result.response.text();
 
-        conversationHistory.push({ role: "user", parts: userMessage });
-        conversationHistory.push({ role: "model", parts: responseText });
-
+        // Save real user message to Database
         try {
-            const newLog = new ChatLog({ user: userMessage, ai: responseText });
-            await newLog.save();
+            await new ChatLog({ user: userMessage, ai: responseText }).save();
         } catch (dbErr) {
-            console.error("Warning: Could not save to MongoDB", dbErr);
+            console.error("MongoDB Save Error:", dbErr);
         }
 
         res.json({ response: responseText });
-
     } catch (error) {
-        console.error("Engine Error:", error);
-        res.status(500).json({ error: "Architect Engine busy." });
+        console.error("AI Engine Error:", error);
+        res.status(500).json({ error: "Engine failed to process the request." });
     }
 });
 
-// 5. SERVER LAUNCH
 app.listen(PORT, () => {
-    console.log(`========================================================`);
-    console.log(`ESGAMING ARCHITECT ENGINE ONLINE (PERSONA ACTIVATED)`);
-    console.log(`Running on Port: ${PORT}`);
-    console.log(`========================================================`);
+    console.log(`Server live on port ${PORT}`);
 });
