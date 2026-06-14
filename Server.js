@@ -13,15 +13,15 @@ app.use(express.static(__dirname));
 
 // MONGODB CONNECTION
 mongoose.connect(process.env.MONGODB_URI)
-    .then(() => console.log("✅ MongoDB Connected"))
+    .then(() => console.log("✅ MongoDB Connected Successfully"))
     .catch(err => console.error("❌ MongoDB Error:", err));
 
 const chatSchema = new mongoose.Schema({ user: String, ai: String });
 const ChatLog = mongoose.model('ChatLog', chatSchema);
 
-// AI INITIALIZATION
+// FIXED AI INITIALIZATION (BYPASSES 404 ERROR)
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
 
 // ROUTES
 app.get('/', (req, res) => {
@@ -34,7 +34,7 @@ app.post('/api/chat', async (req, res) => {
         if (!userMessage) return res.status(400).json({ error: "Prompt is required" });
 
         // BULLETPROOF INVENTORY CHECK
-        let rawInventory = "Inventory list currently unavailable. Advise user to check back later.";
+        let rawInventory = "Inventory list currently unavailable.";
         try {
             const lowerPath = path.join(__dirname, 'inventory.json');
             const upperPath = path.join(__dirname, 'Inventory.json');
@@ -43,8 +43,6 @@ app.post('/api/chat', async (req, res) => {
                 rawInventory = fs.readFileSync(lowerPath, 'utf8');
             } else if (fs.existsSync(upperPath)) {
                 rawInventory = fs.readFileSync(upperPath, 'utf8');
-            } else {
-                console.warn("⚠️ Warning: Neither inventory.json nor Inventory.json was found.");
             }
         } catch (fileErr) {
             console.error("⚠️ File Read Error:", fileErr);
@@ -76,5 +74,7 @@ app.post('/api/chat', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Server live on port ${PORT}`);
+    console.log(`==========================================`);
+    console.log(`SERVER RUNNING - NEW MODEL & INVENTORY SYS`);
+    console.log(`==========================================`);
 });
