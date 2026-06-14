@@ -42,7 +42,7 @@ Your goal is to help users design and plan high-end custom PC builds.
 - DO NOT break character.`;
 
 const model = genAI.getGenerativeModel({ 
-    model: 'gemini-1.5-flash',
+    model: 'gemini-2.5-flash',
     systemInstruction: systemInstruction
 });
 
