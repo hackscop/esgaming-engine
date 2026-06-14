@@ -33,7 +33,6 @@ const ChatLog = mongoose.model('ChatLog', chatSchema);
 const API_KEY = process.env.GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(API_KEY);
 
-// ARCHITECT PERSONA INSTRUCTION
 const systemInstruction = `You are the ESGaming Architect Agent. 
 Your goal is to help users design and plan high-end custom PC builds. 
 - ALWAYS prioritize technical accuracy regarding RTX 50-series and Ryzen 9000-series hardware.
@@ -42,8 +41,8 @@ Your goal is to help users design and plan high-end custom PC builds.
 - DO NOT break character.`;
 
 const model = genAI.getGenerativeModel({ 
-    model: 'gemini-2.5-flash',
-    systemInstruction: systemInstruction
+    model: 'gemini-1.5-flash',
+    systemInstruction: systemInstruction 
 });
 
 let conversationHistory = [];
@@ -58,12 +57,13 @@ app.post('/api/chat', async (req, res) => {
         const userMessage = req.body.prompt;
         if (!userMessage) return res.status(400).json({ error: "Prompt is required" });
 
-        const formattedHistory = conversationHistory.map(msg => ({
-            role: msg.role,
-            parts: [{ text: msg.parts }]
-        }));
+        const chatSession = model.startChat({
+            history: conversationHistory.map(msg => ({
+                role: msg.role,
+                parts: [{ text: msg.parts }]
+            }))
+        });
 
-        const chatSession = model.startChat({ history: formattedHistory });
         const result = await chatSession.sendMessage(userMessage);
         const responseText = result.response.text();
 
@@ -81,7 +81,7 @@ app.post('/api/chat', async (req, res) => {
 
     } catch (error) {
         console.error("Engine Error:", error);
-        res.status(500).json({ error: "Internal server error." });
+        res.status(500).json({ error: "Architect Engine busy." });
     }
 });
 
