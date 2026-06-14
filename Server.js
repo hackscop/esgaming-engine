@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const cors = require('cors'); // 1. REQUIRE THE PACKAGE
 const path = require('path');
 const fs = require('fs');
 const mongoose = require('mongoose');
