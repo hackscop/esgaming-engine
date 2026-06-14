@@ -2,19 +2,36 @@
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
-const fs = require('fs').promises;
+const mongoose = require('mongoose'); // <-- The new MongoDB driver
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const app = express();
-
-// THE RENDER FIX: Cloud servers assign dynamic ports automatically.
 const PORT = process.env.PORT || 3000;
 
-// Middleware to parse JSON and serve static files (like your HTML and CSS)
 app.use(express.json());
 app.use(express.static(__dirname));
 
-// 2. AI & MEMORY INITIALIZATION
+// 2. DATABASE CONNECTION (MONGODB)
+const MONGODB_URI = process.env.MONGODB_URI;
+if (!MONGODB_URI) {
+    console.error("FATAL ERROR: MONGODB_URI is missing from environment variables.");
+    process.exit(1);
+}
+
+// Connect to Atlas
+mongoose.connect(MONGODB_URI)
+    .then(() => console.log("✅ MongoDB Atlas Connected Successfully"))
+    .catch(err => console.error("❌ MongoDB Connection Error:", err));
+
+// Define the Database Structure (Schema) for your logs
+const chatSchema = new mongoose.Schema({
+    timestamp: { type: Date, default: Date.now },
+    user: String,
+    ai: String
+});
+const ChatLog = mongoose.model('ChatLog', chatSchema);
+
+// 3. AI & MEMORY INITIALIZATION
 const API_KEY = process.env.GEMINI_API_KEY;
 if (!API_KEY) {
     console.error("FATAL ERROR: GEMINI_API_KEY is missing from environment variables.");
@@ -24,16 +41,14 @@ if (!API_KEY) {
 const genAI = new GoogleGenerativeAI(API_KEY);
 const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
-// Active memory bank
+// Active memory bank for the current conversation
 let conversationHistory = [];
 
-// 3. ROUTES
-// Frontend Route: Serve the main web page (Must be exactly 'index.html' lowercase)
+// 4. ROUTES
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// API Route: Handle chat requests from the frontend
 app.post('/api/chat', async (req, res) => {
     try {
         const userMessage = req.body.prompt;
@@ -42,36 +57,27 @@ app.post('/api/chat', async (req, res) => {
             return res.status(400).json({ error: "Prompt is required" });
         }
 
-        // Format history for the Gemini SDK
         const formattedHistory = conversationHistory.map(msg => ({
             role: msg.role,
             parts: [{ text: msg.parts }]
         }));
 
-        // Initialize chat with memory
-        const chatSession = model.startChat({
-            history: formattedHistory
-        });
-
-        // Send the new prompt
+        const chatSession = model.startChat({ history: formattedHistory });
         const result = await chatSession.sendMessage(userMessage);
         const responseText = result.response.text();
 
-        // Save interaction to temporary server memory
         conversationHistory.push({ role: "user", parts: userMessage });
         conversationHistory.push({ role: "model", parts: responseText });
 
-        // Optional: Save interaction to persistent database.json
+        // Save permanent log to MongoDB Atlas
         try {
-            const dbData = await fs.readFile('database.json', 'utf8').catch(() => '[]');
-            const db = JSON.parse(dbData || '[]');
-            db.push({ timestamp: new Date().toISOString(), user: userMessage, ai: responseText });
-            await fs.writeFile('database.json', JSON.stringify(db, null, 2));
+            const newLog = new ChatLog({ user: userMessage, ai: responseText });
+            await newLog.save();
+            console.log("✅ Log securely saved to permanent database.");
         } catch (dbErr) {
-            console.error("Warning: Could not write to database.json", dbErr);
+            console.error("Warning: Could not save to MongoDB", dbErr);
         }
 
-        // Send data back to frontend
         res.json({ response: responseText });
 
     } catch (error) {
@@ -80,10 +86,10 @@ app.post('/api/chat', async (req, res) => {
     }
 });
 
-// 4. SERVER LAUNCH
+// 5. SERVER LAUNCH
 app.listen(PORT, () => {
     console.log(`========================================================`);
-    console.log(`DYNAMIC INJECTION ENGINE ONLINE (WITH MEMORY)`);
+    console.log(`DYNAMIC INJECTION ENGINE ONLINE (WITH MEMORY & MONGODB)`);
     console.log(`Running in Production Mode on Port: ${PORT}`);
     console.log(`========================================================`);
 });
