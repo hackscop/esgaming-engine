@@ -1,5 +1,10 @@
 (function() {
-    // 1. INJECT THE STYLES
+    // 1. EXTRACT CLIENT DATA FROM THE SCRIPT TAG
+    const scriptTag = document.getElementById('es-ai-widget');
+    const shopId = scriptTag ? scriptTag.getAttribute('data-shop-id') : 'default';
+    const shopName = scriptTag ? scriptTag.getAttribute('data-shop-name') : 'AI Assistant';
+
+    // 2. INJECT THE STYLES
     const style = document.createElement('style');
     style.innerHTML = `
         #es-widget-btn {
@@ -44,7 +49,7 @@
     `;
     document.head.appendChild(style);
 
-    // 2. CREATE THE WIDGET ELEMENTS
+    // 3. CREATE THE WIDGET ELEMENTS (Using Dynamic Shop Name)
     const btn = document.createElement('button');
     btn.id = 'es-widget-btn';
     btn.innerText = '💬';
@@ -53,9 +58,9 @@
     const chatWindow = document.createElement('div');
     chatWindow.id = 'es-chat-window';
     chatWindow.innerHTML = `
-        <div id="es-chat-header">ESGaming Architect</div>
+        <div id="es-chat-header">${shopName}</div>
         <div id="es-chat-messages">
-            <div class="es-msg-ai">Welcome to the store. What kind of hardware are you looking for today?</div>
+            <div class="es-msg-ai">Welcome to ${shopName}. How can I help you today?</div>
         </div>
         <div id="es-chat-input-container">
             <input type="text" id="es-chat-input" placeholder="Type here..." />
@@ -64,7 +69,7 @@
     `;
     document.body.appendChild(chatWindow);
 
-    // 3. WIDGET LOGIC & API CONNECTION
+    // 4. WIDGET LOGIC & API CONNECTION
     let isOpen = false;
     btn.addEventListener('click', () => {
         isOpen = !isOpen;
@@ -75,27 +80,25 @@
     const inputField = document.getElementById('es-chat-input');
     const messagesDiv = document.getElementById('es-chat-messages');
 
-    // This points directly to your Render server
     const API_URL = 'https://esgaming-engine.onrender.com/api/chat';
 
     async function sendMessage() {
         const text = inputField.value.trim();
         if (!text) return;
 
-        // Print User Message
         messagesDiv.innerHTML += `<div class="es-msg-user">${text}</div>`;
         inputField.value = '';
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
         try {
+            // WE NOW SEND THE SHOP ID TO THE BACKEND
             const response = await fetch(API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ prompt: text })
+                body: JSON.stringify({ prompt: text, shopId: shopId }) 
             });
             const data = await response.json();
             
-            // Print AI Message
             messagesDiv.innerHTML += `<div class="es-msg-ai">${data.response || "Connection error."}</div>`;
         } catch (err) {
             messagesDiv.innerHTML += `<div class="es-msg-ai">System offline. Please try again later.</div>`;
