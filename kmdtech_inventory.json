@@ -1,0 +1,27 @@
+{
+  "store_name": "KMDTech",
+  "inventory": [
+    {
+      "item": "iPhone 15 Pro Max 256GB",
+      "price": "190,000 KES",
+      "status": "In Stock",
+      "colors": ["Titanium Black", "Natural Titanium"]
+    },
+    {
+      "item": "PlayStation 5 Disc Edition",
+      "price": "85,000 KES",
+      "status": "In Stock",
+      "accessories_included": ["1x DualSense Controller"]
+    },
+    {
+      "item": "Samsung Galaxy S24 Ultra",
+      "price": "165,000 KES",
+      "status": "Low Stock",
+      "colors": ["Titanium Gray"]
+    }
+  ],
+  "policies": {
+    "delivery": "Same-day delivery within Nairobi CBD. Next-day delivery rest of Kenya.",
+    "warranty": "1-year official manufacturer warranty on all devices."
+  }
+}
