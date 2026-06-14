@@ -1,3 +1,4 @@
+// 1. IMPORTS & CONFIGURATION
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
@@ -5,74 +6,84 @@ const fs = require('fs').promises;
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const app = express();
-const PORT = 3000;
 
-// PASTE YOUR GEMINI API KEY HERE
+// THE RENDER FIX: Cloud servers assign dynamic ports automatically.
+const PORT = process.env.PORT || 3000;
+
+// Middleware to parse JSON and serve static files (like your HTML and CSS)
+app.use(express.json());
+app.use(express.static(__dirname));
+
+// 2. AI & MEMORY INITIALIZATION
 const API_KEY = process.env.GEMINI_API_KEY;
+if (!API_KEY) {
+    console.error("FATAL ERROR: GEMINI_API_KEY is missing from environment variables.");
+    process.exit(1);
+}
 
 const genAI = new GoogleGenerativeAI(API_KEY);
+const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
-// THE FIX: We create a global memory bank outside the route so it doesn't get erased
+// Active memory bank
 let conversationHistory = [];
 
+// 3. ROUTES
+// Frontend Route: Serve the main web page (Must be exactly 'index.html' lowercase)
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-app.get('/ask', async (req, res) => {
+// API Route: Handle chat requests from the frontend
+app.post('/api/chat', async (req, res) => {
     try {
-        const userPrompt = req.query.prompt;
-        if (!userPrompt) return res.status(400).json({ error: "Prompt cannot be empty." });
-
-        const dbData = await fs.readFile(path.join(__dirname, 'database.json'), 'utf-8');
-        const liveInventory = JSON.parse(dbData);
+        const userMessage = req.body.prompt;
         
-        let inventoryText = "LIVE INVENTORY STATUS:\n";
-        liveInventory.forEach(product => {
-            inventoryText += `- ${product.item}: ${product.price} KES (${product.status})\n`;
-        });
-
-        const model = genAI.getGenerativeModel({ 
-            model: "gemini-2.5-flash",
-            generationConfig: { temperature: 0.7 },
-            systemInstruction: `You are the AI Assistant for ESGaming. 
-
-            ${inventoryText}
-
-            CORE BEHAVIOR RULES:
-            1. Only quote prices and availability based on the LIVE INVENTORY STATUS provided above. If an item is "Out of Stock", tell the user explicitly.
-            2. Be natural, conversational, and friendly. Handle greetings casually.
-            3. Off-Topic Boundary: Only assist with gaming, hardware, or the ESGaming store.
-            4. Website Action: If the user asks to see a section, output JSON: {"reply": "...", "action": "scroll", "target": "#css-id"}. Otherwise, just reply naturally in plain text.`
-        });
-
-        // THE FIX: We feed the past conversation into the AI before asking the new question
-        const chatSession = model.startChat({ history: conversationHistory });
-        const result = await chatSession.sendMessage(userPrompt);
-        let rawResponse = result.response.text();
-
-        // THE FIX: We record both what you said, and what the AI answered, into the memory bank for next time
-        conversationHistory.push({ role: "user", parts: [{ text: userPrompt }] });
-        conversationHistory.push({ role: "model", parts: [{ text: rawResponse }] });
-
-        let aiCommand;
-        try {
-            let cleaned = rawResponse.replace(/```json/gi, '').replace(/```/gi, '').trim();
-            aiCommand = JSON.parse(cleaned);
-        } catch (e) {
-            aiCommand = { reply: rawResponse, action: "none", target: null };
+        if (!userMessage) {
+            return res.status(400).json({ error: "Prompt is required" });
         }
 
-        res.json(aiCommand);
+        // Format history for the Gemini SDK
+        const formattedHistory = conversationHistory.map(msg => ({
+            role: msg.role,
+            parts: [{ text: msg.parts }]
+        }));
+
+        // Initialize chat with memory
+        const chatSession = model.startChat({
+            history: formattedHistory
+        });
+
+        // Send the new prompt
+        const result = await chatSession.sendMessage(userMessage);
+        const responseText = result.response.text();
+
+        // Save interaction to temporary server memory
+        conversationHistory.push({ role: "user", parts: userMessage });
+        conversationHistory.push({ role: "model", parts: responseText });
+
+        // Optional: Save interaction to persistent database.json
+        try {
+            const dbData = await fs.readFile('database.json', 'utf8').catch(() => '[]');
+            const db = JSON.parse(dbData || '[]');
+            db.push({ timestamp: new Date().toISOString(), user: userMessage, ai: responseText });
+            await fs.writeFile('database.json', JSON.stringify(db, null, 2));
+        } catch (dbErr) {
+            console.error("Warning: Could not write to database.json", dbErr);
+        }
+
+        // Send data back to frontend
+        res.json({ response: responseText });
+
     } catch (error) {
-        console.error("Engine internal fault:", error);
-        res.status(500).json({ error: "Agent Engine failure.", details: error.message });
+        console.error("Engine Error:", error);
+        res.status(500).json({ error: "Internal server error connecting to AI engine." });
     }
 });
 
+// 4. SERVER LAUNCH
 app.listen(PORT, () => {
-    console.log("=========================================");
-    console.log("DYNAMIC INJECTION ENGINE ONLINE (WITH MEMORY)");
-    console.log("Server: http://localhost:" + PORT);
-    console.log("=========================================");
+    console.log(`========================================================`);
+    console.log(`DYNAMIC INJECTION ENGINE ONLINE (WITH MEMORY)`);
+    console.log(`Running in Production Mode on Port: ${PORT}`);
+    console.log(`========================================================`);
 });
