@@ -60,7 +60,7 @@
         }
         .es-msg-user { align-self: flex-end; background: #cc0000; color: white; padding: 10px 14px; border-radius: 15px 15px 0 15px; font-size: 14px; max-width: 85%; }
         .es-msg-ai { align-self: flex-start; background: #ffffff; color: #000000; padding: 10px 14px; border-radius: 15px 15px 15px 0; font-size: 14px; max-width: 85%; line-height: 1.5; }
-        .es-msg-ai strong { color: #f0f0f0; } /* Makes bold text pop */
+        .es-msg-ai strong { color: #cc0000; } /* Makes bold text pop */
     `;
     document.head.appendChild(style);
 
