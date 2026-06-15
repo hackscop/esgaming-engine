@@ -8,7 +8,7 @@
     style.innerHTML = `
         #es-widget-btn {
             position: fixed; bottom: 20px; right: 20px;
-            background: #8A2BE2; color: white; border: none;
+            background: #cc0000; color: white; border: none;
             border-radius: 50%; width: 60px; height: 60px;
             font-size: 24px; cursor: pointer; z-index: 999999;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: 0.3s;
@@ -17,8 +17,8 @@
         
         #es-chat-window {
             position: fixed; bottom: 90px; right: 20px;
-            width: 350px; height: 500px; background: #1a1a2e;
-            border: 1px solid #8A2BE2; border-radius: 10px;
+            width: 350px; height: 500px; background: #000000;
+            border: 1px solid #cc0000; border-radius: 10px;
             display: none; flex-direction: column; z-index: 999999;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -36,7 +36,7 @@
         }
 
         #es-chat-header {
-            background: #8A2BE2; color: white; padding: 15px;
+            background: #000000; color: #cc0000; border-bottom: 1px solid #cc0000; padding: 15px;
             font-weight: bold; text-align: center; letter-spacing: 1px;
             display: flex; justify-content: space-between; align-items: center;
         }
@@ -55,10 +55,10 @@
             background: #1a1a2e; color: white; outline: none; font-size: 16px; /* Prevents iOS zoom */
         }
         #es-chat-send {
-            background: #8A2BE2; color: white; border: none; font-weight: bold;
+            background: #cc0000; color: white; border: none; font-weight: bold;
             padding: 0 15px; margin-left: 10px; border-radius: 5px; cursor: pointer;
         }
-        .es-msg-user { align-self: flex-end; background: #333; padding: 10px 14px; border-radius: 15px 15px 0 15px; font-size: 14px; max-width: 85%; }
+        .es-msg-user { align-self: flex-end; background: #cc0000; color: white; padding: 10px 14px; border-radius: 15px 15px 0 15px; font-size: 14px; max-width: 85%; }
         .es-msg-ai { align-self: flex-start; background: #8A2BE2; padding: 10px 14px; border-radius: 15px 15px 15px 0; font-size: 14px; max-width: 85%; line-height: 1.5; }
         .es-msg-ai strong { color: #f0f0f0; } /* Makes bold text pop */
     `;
@@ -140,7 +140,46 @@
             
             // Apply the Markdown formatter before injecting
             const formattedResponse = formatText(data.response || "Connection error.");
-            messagesDiv.innerHTML += `<div class="es-msg-ai">${formattedResponse}</div>`;
+
+// 1. Create an empty chat bubble for the AI
+const aiBubble = document.createElement('div');
+aiBubble.className = 'es-msg-ai';
+messagesDiv.appendChild(aiBubble);
+
+// 2. Trigger the flowing text effect inside that bubble
+typeWriter(aiBubble, formattedResponse);
+   function typeWriter(element, htmlContent, speed = 15) {
+    element.innerHTML = "";
+    let i = 0;
+    let isTag = false;
+
+    function type() {
+        if (i < htmlContent.length) {
+            let char = htmlContent.charAt(i);
+            
+            // Fast-forward through HTML tags so it doesn't print code
+            if (char === '<') isTag = true;
+            
+            element.innerHTML += char;
+            i++;
+
+            if (isTag) {
+                while (i < htmlContent.length && htmlContent.charAt(i - 1) !== '>') {
+                    element.innerHTML += htmlContent.charAt(i);
+                    i++;
+                }
+                isTag = false;
+            }
+
+            // Keep scrolling down as text flows
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+            setTimeout(type, speed);
+        }
+    }
+    type();
+}
+
             
         } catch (err) {
             document.getElementById(loadingId).remove();
