@@ -59,7 +59,7 @@
             padding: 0 15px; margin-left: 10px; border-radius: 5px; cursor: pointer;
         }
         .es-msg-user { align-self: flex-end; background: #cc0000; color: white; padding: 10px 14px; border-radius: 15px 15px 0 15px; font-size: 14px; max-width: 85%; }
-        .es-msg-ai { align-self: flex-start; background: #8A2BE2; padding: 10px 14px; border-radius: 15px 15px 15px 0; font-size: 14px; max-width: 85%; line-height: 1.5; }
+        .es-msg-ai { align-self: flex-start; background: #ffffff; color: #000000; padding: 10px 14px; border-radius: 15px 15px 15px 0; font-size: 14px; max-width: 85%; line-height: 1.5; }
         .es-msg-ai strong { color: #f0f0f0; } /* Makes bold text pop */
     `;
     document.head.appendChild(style);
@@ -147,29 +147,37 @@ aiBubble.className = 'es-msg-ai';
 messagesDiv.appendChild(aiBubble);
 
 // 2. Trigger the flowing text effect inside that bubble
-typeWriter(aiBubble, formattedResponse);
-   function typeWriter(element, htmlContent, speed = 15) {
-    element.innerHTML = "";
+function typeWriter(element, htmlContent, speed = 15) {
     let i = 0;
+    let currentText = "";
     let isTag = false;
+    let chatBox = element.parentElement; // Auto-targets the chat window for scrolling
 
     function type() {
         if (i < htmlContent.length) {
             let char = htmlContent.charAt(i);
-            
-            // Fast-forward through HTML tags so it doesn't print code
-            if (char === '<') isTag = true;
-            
-            element.innerHTML += char;
+            currentText += char;
             i++;
+            
+            if (char === '<') isTag = true;
+            if (char === '>') isTag = false;
 
+            // If we are building an HTML tag, skip the delay and don't render it yet
             if (isTag) {
-                while (i < htmlContent.length && htmlContent.charAt(i - 1) !== '>') {
-                    element.innerHTML += htmlContent.charAt(i);
-                    i++;
-                }
-                isTag = false;
+                type();
+                return;
             }
+
+            // Only render to the screen when we are dealing with normal text or a fully completed tag
+            element.innerHTML = currentText;
+            if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
+
+            setTimeout(type, speed);
+        }
+    }
+    type();
+}
+
 
             // Keep scrolling down as text flows
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
