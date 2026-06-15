@@ -13,6 +13,13 @@ const PORT = process.env.PORT || 10000;
 app.use(cors()); 
 
 app.use(express.json());
+// ==========================================
+// HEALTH CHECK ROUTE FOR UPTIMEROBOT
+// ==========================================
+app.get('/', (req, res) => {
+    res.status(200).send('ESG Engine is live and running.');
+});
+
 app.use(express.static(__dirname));
 
 // 2. DATABASE CONFIGURATION
