@@ -146,58 +146,53 @@ const aiBubble = document.createElement('div');
 aiBubble.className = 'es-msg-ai';
 messagesDiv.appendChild(aiBubble);
 
-// 2. Trigger the flowing text effect inside that bubble
+        // 2. Trigger the flowing text effect
+        typeWriter(aiBubble, formattedResponse);
+
+    } catch (err) {
+        document.getElementById(loadingId).remove();
+        messagesDiv.innerHTML += `<div class="es-msg-ai">System offline or waking up. Please try again in 30 seconds.</div>`;
+    }
+    
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+} // Closes the sendMessage function
+
+// 3. EVENT LISTENERS FOR THE BUTTONS
+sendBtn.addEventListener('click', sendMessage);
+inputField.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') sendMessage();
+});
+
+})(); // THIS CLOSES THE ENTIRE WIDGET APP - CRITICAL!
+
+// ==========================================
+// THE TYPEWRITER HELPER FUNCTION
+// ==========================================
 function typeWriter(element, htmlContent, speed = 15) {
-    let i = 0;
-    let currentText = "";
-    let isTag = false;
-    let chatBox = element.parentElement; // Auto-targets the chat window for scrolling
+let i = 0;
+let currentText = "";
+let isTag = false;
+let chatBox = element.parentElement; 
 
-    function type() {
-        if (i < htmlContent.length) {
-            let char = htmlContent.charAt(i);
-            currentText += char;
-            i++;
-            
-            if (char === '<') isTag = true;
-            if (char === '>') isTag = false;
+function type() {
+    if (i < htmlContent.length) {
+        let char = htmlContent.charAt(i);
+        currentText += char;
+        i++;
+        
+        if (char === '<') isTag = true;
+        if (char === '>') isTag = false;
 
-            // If we are building an HTML tag, skip the delay and don't render it yet
-            if (isTag) {
-                type();
-                return;
-            }
-
-            // Only render to the screen when we are dealing with normal text or a fully completed tag
-            element.innerHTML = currentText;
-            if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
-
-            setTimeout(type, speed);
+        if (isTag) {
+            type();
+            return;
         }
+
+        element.innerHTML = currentText;
+        if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
+
+        setTimeout(type, speed);
     }
-    type();
 }
-
-
-            // Keep scrolling down as text flows
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-
-            setTimeout(type, speed);
-        }
-    }
-    type();
+type();
 }
-
-            
-        } catch (err) {
-            document.getElementById(loadingId).remove();
-            messagesDiv.innerHTML += `<div class="es-msg-ai">System offline or waking up. Please try again in 30 seconds.</div>`;
-        }
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-    }
-
-    sendBtn.addEventListener('click', sendMessage);
-    inputField.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') sendMessage();
-    });
-})();
