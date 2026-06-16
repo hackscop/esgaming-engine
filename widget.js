@@ -8,7 +8,21 @@
     style.innerHTML = `
         #es-widget-btn { position: fixed; bottom: 20px; right: 20px; background: ${primaryColor}; color: white; border: none; border-radius: 50%; width: 60px; height: 60px; font-size: 24px; cursor: pointer; z-index: 999139; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; }
         #es-chat-window { position: fixed; bottom: 90px; right: 20px; width: 380px; height: 620px; background: #ffffff; border: 1px solid #f0f0f0; border-radius: 24px; box-shadow: 0px 12px 30px rgba(0,0,0,0.1); display: none; flex-direction: column; z-index: 999999; overflow: hidden; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-        @media (max-width: 600px) { #es-chat-window { width: 100vw; height: 100vh; bottom: 0; right: 0; border-radius: 0; } }
+        
+        /* FIXED MOBILE VIEWPORT AND KEYBOARD SQUASHING */
+        @media (max-width: 600px) { 
+            #es-chat-window { 
+                width: 100vw; 
+                height: 100%; /* Fallback for older browsers */
+                height: 100dvh; /* Dynamic viewport adapts to the keyboard */
+                top: 0; 
+                left: 0; 
+                bottom: auto;
+                right: auto;
+                border-radius: 0; 
+            } 
+        }
+        
         #es-chat-header { background: ${primaryColor}; color: white; padding: 24px 20px 35px 20px; display: flex; align-items: center; gap: 15px; position: relative; border-bottom-left-radius: 50% 20px; border-bottom-right-radius: 50% 20px; transition: background 0.3s ease; }
         .header-back-arrow { cursor: pointer; font-size: 22px; color: white; font-weight: 300; }
         .header-avatar { width: 44px; height: 44px; background: rgba(255, 255, 255, 0.25); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; }
@@ -94,14 +108,15 @@
                 body: JSON.stringify(requestBody)
             });
 
+            if (!response.ok) {
+                throw new Error("API Limit or Server Error");
+            }
+
             const data = await response.json();
             document.getElementById(`lbl-${loadingId}`).remove();
             document.getElementById(loadingId).remove();
 
-            // DYNAMIC MULTI-TENANT HANDOFF LOGIC
             if (data.response && data.response.includes("[TRIGGER_HUMAN_HANDOFF]")) {
-                
-                // Pulls the specific WhatsApp number provided by your server, defaults to dummy number if missing
                 const waNumber = data.whatsapp || "254700000000";
                 
                 headerTitle.innerHTML = "Live Agent Transfer";
@@ -135,7 +150,7 @@
         } catch (err) {
             document.getElementById(`lbl-${loadingId}`).remove();
             document.getElementById(loadingId).remove();
-            messagesDiv.innerHTML += `<div class="es-chat-meta-label">System</div><div class="es-msg-ai">Connection failed. Please try again.</div>`;
+            messagesDiv.innerHTML += `<div class="es-chat-meta-label">System</div><div class="es-msg-ai">Connection error.</div>`;
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
     }
