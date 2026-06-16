@@ -15,8 +15,8 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 const shopProfiles = {
     "phoneplace": {
         location: "Bazaar Plaza, Mezzanine Floor, Nairobi CBD",
-        support: "+254 700 000 000",
-        whatsapp: "254700000000"
+        support: "0722 466 466",
+        whatsapp: "254722466466"
     },
     "pcgamer": {
         location: "Biashara Street, Nairobi CBD",
