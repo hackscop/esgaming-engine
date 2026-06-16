@@ -3,24 +3,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The PC Gamer 254 | AI Prototype</title>
+    <title>The PC Gamer 254 | Premium Custom Builds</title>
     <style>
-        /* Giving the test page a dark gamer vibe */
         body { 
             background-color: #0d0d0d; 
             color: white; 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            text-align: center; 
-            padding-top: 100px; 
+            margin: 0;
+            padding: 0;
         }
-        h1 { color: #00ff00; letter-spacing: 2px; text-transform: uppercase; }
+        .header {
+            background-color: #1a1a1a;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid #00ff00;
+        }
+        .header h1 { 
+            color: #00ff00; 
+            letter-spacing: 3px; 
+            text-transform: uppercase; 
+            margin: 0;
+        }
+        .hero {
+            text-align: center;
+            padding: 80px 20px;
+            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1587202372634-32705e3bf49c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80') center/cover;
+        }
+        .hero h2 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+        .hero p {
+            font-size: 18px;
+            color: #cccccc;
+        }
+        .grid {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 40px;
+            flex-wrap: wrap;
+        }
+        .card {
+            background-color: #1a1a1a;
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 20px;
+            width: 250px;
+            text-align: center;
+        }
+        .card h3 { color: #00ff00; }
     </style>
 </head>
 <body>
 
-    <h1>The PC Gamer .254</h1>
-    <p>AI Sales Rep Prototype Live Environment</p>
+    <div class="header">
+        <h1>THE PC GAMER 254</h1>
+    </div>
 
+    <div class="hero">
+        <h2>DOMINATE THE LOBBY</h2>
+        <p>Custom PC Builds & Premium Gaming Gear in Nairobi.</p>
+    </div>
+
+    <div class="grid">
+        <div class="card">
+            <h3>Warzone Elite Build</h3>
+            <p>RTX 4070 | Ryzen 7</p>
+            <p><strong>210,000 KES</strong></p>
+        </div>
+        <div class="card">
+            <h3>144Hz IPS Monitor</h3>
+            <p>AOC 24G2 Gaming</p>
+            <p><strong>28,500 KES</strong></p>
+        </div>
+        <div class="card">
+            <h3>Esports Starter</h3>
+            <p>RTX 3060 | i5</p>
+            <p><strong>125,000 KES</strong></p>
+        </div>
+    </div>
+
+    <!-- YOUR MULTI-TENANT SAAS WIDGET -->
     <script src="widget.js" 
             id="es-ai-widget"
             data-shop-id="thepcgamer254" 
