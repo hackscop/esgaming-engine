@@ -1,0 +1,42 @@
+[
+  {
+    "shop_id": "thepcgamer254",
+    "name": "Warzone Elite Build (RTX 4070)",
+    "category": "Gaming PC",
+    "price": "210,000 KES",
+    "specs": "AMD Ryzen 7 5800X, NVIDIA RTX 4070 12GB, 32GB 3200MHz RAM, 1TB NVMe SSD, 750W Gold PSU",
+    "in_stock": true
+  },
+  {
+    "shop_id": "thepcgamer254",
+    "name": "Esports Starter Build (RTX 3060)",
+    "category": "Gaming PC",
+    "price": "125,000 KES",
+    "specs": "Intel Core i5-12400F, NVIDIA RTX 3060 12GB, 16GB 3200MHz RAM, 512GB NVMe SSD, 600W PSU",
+    "in_stock": true
+  },
+  {
+    "shop_id": "thepcgamer254",
+    "name": "AOC 24G2 24-inch 144Hz Gaming Monitor",
+    "category": "Monitor",
+    "price": "28,500 KES",
+    "specs": "1080p, 144Hz refresh rate, 1ms response time, IPS panel",
+    "in_stock": true
+  },
+  {
+    "shop_id": "thepcgamer254",
+    "name": "Razer DeathAdder V2 Gaming Mouse",
+    "category": "Accessories",
+    "price": "7,500 KES",
+    "specs": "20K DPI optical sensor, RGB lighting, lightweight ergonomic design",
+    "in_stock": true
+  },
+  {
+    "shop_id": "thepcgamer254",
+    "name": "Redragon K552 Mechanical Keyboard",
+    "category": "Accessories",
+    "price": "6,000 KES",
+    "specs": "Tenkeyless, Outemu Red linear switches, RGB backlit",
+    "in_stock": true
+  }
+]
