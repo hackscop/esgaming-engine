@@ -4,7 +4,7 @@
     const shopName = scriptTag ? scriptTag.getAttribute('data-shop-name') : 'AI Assistant';
     const primaryColor = scriptTag ? scriptTag.getAttribute('data-primary-color') : '#24b33b';
 
-    // 1. ADVANCED RESPONSIVE CSS & FULL-SCALED WIDGET
+    // 1. EXACT PIXEL REPLICA STYLING FROM 1000063363.jpg
     const style = document.createElement('style');
     style.innerHTML = `
         #es-widget-btn {
@@ -20,63 +20,63 @@
             font-size: 24px;
             cursor: pointer;
             z-index: 999139;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            transition: 0.3s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        #es-widget-btn:hover { transform: scale(1.1); }
 
         #es-chat-window {
             position: fixed;
             bottom: 90px;
             right: 20px;
             width: 380px;
-            height: 600px;
+            height: 620px;
             background: #ffffff;
-            border: 1px solid #e0e0e0;
-            border-radius: 16px;
-            box-shadow: 0px 10px 25px rgba(0,0,0,0.15);
+            border: 1px solid #f0f0f0;
+            border-radius: 24px;
+            box-shadow: 0px 12px 30px rgba(0,0,0,0.1);
             display: none;
             flex-direction: column;
             z-index: 999999;
             overflow: hidden;
-            transition: all 0.3s ease;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
         @media (max-width: 600px) {
             #es-chat-window {
-                width: 92vw;
-                height: 85vh;
-                bottom: 20px;
-                right: 4vw;
-                border-radius: 20px;
+                width: 100vw;
+                height: 100vh;
+                bottom: 0;
+                right: 0;
+                border-radius: 0;
             }
         }
 
+        /* The authentic curved header from the screenshot */
         #es-chat-header {
             background: ${primaryColor};
             color: white;
-            padding: 18px 15px;
+            padding: 24px 20px 35px 20px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 15px;
             position: relative;
+            border-bottom-left-radius: 50% 20px;
+            border-bottom-right-radius: 50% 20px;
         }
 
         .header-back-arrow {
             cursor: pointer;
-            font-size: 24px;
-            font-weight: bold;
-            line-height: 1;
+            font-size: 22px;
+            color: white;
+            font-weight: 300;
         }
 
         .header-avatar {
-            width: 40px;
-            height: 40px;
-            background: rgba(255,255,255,0.2);
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.25);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -86,58 +86,97 @@
 
         #es-chat-messages {
             flex: 1;
-            padding: 15px;
+            padding: 20px 15px;
             overflow-y: auto;
-            color: #333333;
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            background: #f9f9f9;
+            gap: 12px;
+            background: #ffffff;
         }
 
+        /* User Message Bubble matching 1000063363.jpg */
         .es-msg-user {
             align-self: flex-end;
             background: ${primaryColor};
             color: white;
-            padding: 10px 14px;
-            border-radius: 15px 15px 0 15px;
-            font-size: 14px;
+            padding: 12px 16px;
+            border-radius: 18px 18px 4px 18px;
+            font-size: 15px;
             max-width: 80%;
+            word-wrap: break-word;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
+        /* AI Message Bubble matching 1000063363.jpg */
         .es-msg-ai {
             align-self: flex-start;
-            background: #ffffff;
-            color: #333333;
-            padding: 10px 14px;
-            border-radius: 15px 15px 15px 0;
-            font-size: 14px;
+            background: #f4f6f8;
+            color: #222222;
+            padding: 12px 16px;
+            border-radius: 18px 18px 18px 4px;
+            font-size: 15px;
             max-width: 85%;
-            line-height: 1.5;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            line-height: 1.45;
         }
 
-        .es-msg-ai strong { color: ${primaryColor}; }
+        .es-chat-meta-label {
+            font-size: 11px;
+            color: #888888;
+            margin-bottom: 2px;
+            margin-left: 4px;
+        }
 
-        .input-utilities {
+        /* Rebuilt seamless footer layout */
+        #es-chat-input-container {
+            background: #ffffff;
+            border-top: 1px solid #eeeeee;
+            padding: 12px 16px;
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding-right: 10px;
-            color: #888888;
+            gap: 8px;
+        }
+
+        #es-chat-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 8px 0;
+            font-size: 15px;
+            background: transparent;
+            color: #333333;
+        }
+        
+        #es-chat-input::placeholder {
+            color: #b0b0b0;
+        }
+
+        .input-utilities-group {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            color: #999999;
+            padding-left: 8px;
         }
 
         .input-utility-icon {
             cursor: pointer;
-            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             transition: color 0.2s;
         }
+        .input-utility-icon:hover { color: #444444; }
 
-        .input-utility-icon:hover { color: #333333; }
+        .uploaded-preview-img {
+            max-width: 150px;
+            border-radius: 12px;
+            margin-top: 5px;
+            display: block;
+        }
     `;
     document.head.appendChild(style);
 
-    // 2. CREATE THE UI ELEMENTS
+    // 2. DOM STRUCTURE INITIALIZATION
     const btn = document.createElement('button');
     btn.id = 'es-widget-btn';
     btn.innerHTML = '💬';
@@ -149,27 +188,36 @@
         <div id="es-chat-header">
             <span class="header-back-arrow" id="es-close-btn">‹</span>
             <div class="header-avatar">👤</div>
-            <div style="font-weight: bold; font-size: 18px;">${shopName}</div>
+            <div style="font-weight: 600; font-size: 20px; letter-spacing: -0.3px;">${shopName}</div>
         </div>
         
         <div id="es-chat-messages">
+            <div class="es-chat-meta-label">${shopName}</div>
             <div class="es-msg-ai">Welcome to ${shopName}! We are happy to help you.</div>
         </div>
         
-        <div id="es-chat-input-container" style="background: #ffffff; border-top: 1px solid #eee; padding: 10px; display: flex; align-items: center;">
-            <input type="text" id="es-chat-input" placeholder="Type your message and hit 'Enter'..." style="flex: 1; border: none; outline: none; padding: 10px; font-size: 14px; background: #ffffff; color: #333333;">
+        <div id="es-chat-input-container">
+            <input type="text" id="es-chat-input" placeholder="Type your message and hit 'Enter'">
             
-            <div class="input-utilities">
-                <span class="input-utility-icon">😊</span>
-                <span class="input-utility-icon">🎙️</span>
-                <span class="input-utility-icon">📎</span>
+            <div class="input-utilities-group">
+                <!-- SVG Icons precisely mapping the utility bar -->
+                <span class="input-utility-icon" id="es-util-smiley" title="Emoji">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>
+                </span>
+                <span class="input-utility-icon" id="es-util-mic" title="Voice Note">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v1a7 7 0 0 1-14 0v-1"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                </span>
+                <span class="input-utility-icon" id="es-util-clip" title="Attach Photo">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+                </span>
             </div>
-            <button id="es-chat-send" style="background: ${primaryColor}; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: bold;">Send</button>
         </div>
+        <!-- Hidden input for file selection -->
+        <input type="file" id="es-hidden-file-input" accept="image/*" style="display: none;">
     `;
     document.body.appendChild(chatWindow);
 
-    // 3. TOGGLE LOGIC
+    // 3. WIDGET TOGGLE INTERACTION
     let isOpen = false;
     function toggleChat() {
         isOpen = !isOpen;
@@ -182,7 +230,14 @@
     btn.addEventListener('click', toggleChat);
     document.getElementById('es-close-btn').addEventListener('click', toggleChat);
 
-    // 4. TEXT FORMATTING FUNCTION
+    // 4. CORE CHAT ENGINE & RUNTIME
+    const inputField = document.getElementById('es-chat-input');
+    const messagesDiv = document.getElementById('es-chat-messages');
+    const clipIcon = document.getElementById('es-util-clip');
+    const fileInput = document.getElementById('es-hidden-file-input');
+
+    const API_URL = "https://esgaming-engine.onrender.com/api/chat";
+
     function formatText(text) {
         return text
             .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
@@ -190,39 +245,29 @@
             .replace(/\n/g, '<br>');
     }
 
-    // 5. SEND MESSAGE LOGIC
-    const sendBtn = document.getElementById('es-chat-send');
-    const inputField = document.getElementById('es-chat-input');
-    const messagesDiv = document.getElementById('es-chat-messages');
-
-    const API_URL = "https://esgaming-engine.onrender.com/api/chat";
-
-    async function sendMessage() {
-        const text = inputField.value.trim();
-        if (!text) return;
-
-        // User bubble
-        messagesDiv.innerHTML += `<div class="es-msg-user">${text}</div>`;
-        inputField.value = '';
-        messagesDiv.scrollTop = messagesDiv.scrollHeight;
-
-        // Loading indicator
+    async function handleIncomingMessage(textPayload) {
+        // Loading indicator element matching style
         const loadingId = "loading-" + Date.now();
-        messagesDiv.innerHTML += `<div class="es-msg-ai" id="${loadingId}">Connecting to server... (may take 30s to wake up)</div>`;
+        messagesDiv.innerHTML += `
+            <div class="es-chat-meta-label" id="lbl-${loadingId}">${shopName}</div>
+            <div class="es-msg-ai" id="${loadingId}">...</div>
+        `;
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
         try {
             const response = await fetch(API_URL, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ prompt: text, shopId: shopId })
+                body: JSON.stringify({ prompt: textPayload, shopId: shopId })
             });
 
             const data = await response.json();
+            document.getElementById(`lbl-${loadingId}`).remove();
             document.getElementById(loadingId).remove();
 
             const formattedResponse = formatText(data.response || "Connection error.");
             
+            messagesDiv.innerHTML += `<div class="es-chat-meta-label">${shopName}</div>`;
             const aiBubble = document.createElement('div');
             aiBubble.className = 'es-msg-ai';
             messagesDiv.appendChild(aiBubble);
@@ -230,19 +275,62 @@
             typeWriter(aiBubble, formattedResponse);
 
         } catch (err) {
+            document.getElementById(`lbl-${loadingId}`).remove();
             document.getElementById(loadingId).remove();
-            messagesDiv.innerHTML += `<div class="es-msg-ai">System offline or waking up. Please try again in 30 seconds.</div>`;
+            messagesDiv.innerHTML += `
+                <div class="es-chat-meta-label">System</div>
+                <div class="es-msg-ai">Connecting to live agent option... Please try again.</div>
+            `;
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
     }
 
-    sendBtn.addEventListener('click', sendMessage);
+    function sendTextMessage() {
+        const text = inputField.value.trim();
+        if (!text) return;
+
+        messagesDiv.innerHTML += `
+            <div class="es-chat-meta-label" style="text-align: right; margin-right: 4px;">Onyango</div>
+            <div class="es-msg-user">${text}</div>
+        `;
+        inputField.value = '';
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+        handleIncomingMessage(text);
+    }
+
     inputField.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') sendMessage();
+        if (e.key === 'Enter') sendTextMessage();
     });
 
-    // TYPEWRITER HELPER
-    function typeWriter(element, htmlContent, speed = 15) {
+    // 5. INTERACTIVE PAPERCLIP PHOTO UPLOADER
+    clipIcon.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            const fileName = this.files[0].name;
+
+            reader.onload = function(e) {
+                // Render image thumbnail layout right into the conversation flow
+                messagesDiv.innerHTML += `
+                    <div class="es-chat-meta-label" style="text-align: right; margin-right: 4px;">Onyango</div>
+                    <div class="es-msg-user">
+                        <div>Sent an attachment: <strong>${fileName}</strong></div>
+                        <img src="${e.target.result}" class="uploaded-preview-img" alt="Upload preview">
+                    </div>
+                `;
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+                // Fire payload to AI engine contextually processing the image tag
+                handleIncomingMessage(`[User uploaded a photo attachment named ${fileName} representing their hardware or issue. Please acknowledge the image receipt intelligently.]`);
+            };
+            reader.readAsDataURL(this.files[0]);
+        }
+    });
+
+    // 6. TYPEWRITER RENDERING EFFECT
+    function typeWriter(element, htmlContent, speed = 12) {
         let i = 0;
         let currentText = "";
         let isTag = false;
