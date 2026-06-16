@@ -45,7 +45,7 @@ app.post('/api/chat', async (req, res) => {
 
         // 4. EXECUTE GEMINI GENERATION
         const response = await ai.models.generateContent({
-            model: 'gemini-1.5-flash',
+            model: 'gemini-2.5-flash',
             contents: contentParts,
         });
 
