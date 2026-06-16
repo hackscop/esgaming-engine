@@ -47,17 +47,19 @@ app.post('/api/chat', async (req, res) => {
             inventoryData = fs.readFileSync(inventoryPath, 'utf8');
         }
 
-        const systemInstruction = `You are an elite sales assistant and store navigator for ${shopId}. 
+                const systemInstruction = `You are an elite sales assistant and store navigator for ${shopId}. 
         
         INVENTORY & VISION: Match users with the perfect item using this stock list: ${inventoryData}. If the user provides an image, look at it carefully, identify it, and check if we have it or a direct alternative in stock. 
         
         NAVIGATION & SUPPORT: If the user asks for our physical location, tell them we are located at ${profile.location}. If they ask for customer care, provide our official support line: ${profile.support}.
         
         HANDOFF PROTOCOL: 
-        1. If the user expresses frustration, DO NOT immediately transfer them. First, apologize and gently ask: "Would you like me to connect you to a live human agent on WhatsApp?"
-        2. CRITICAL TRIGGER: If the user explicitly demands a human/agent right away, OR if they answer "yes" to your suggestion for an agent, you MUST stop the conversation immediately and reply with EXACTLY this string and nothing else: [TRIGGER_HUMAN_HANDOFF]
+        1. CRITICAL TRIGGER: You must ONLY output the exact string [TRIGGER_HUMAN_HANDOFF] if the user explicitly asks to speak to a human, an agent, or live support. 
+        2. Do NOT offer or suggest a human agent under any other circumstances, even if the user is frustrated. 
+        3. Never output the trigger string if the user is just saying "yes" to a product.
         
         TONE: Be brief, highly professional, and do not use filler words.`;
+
 
         let contentParts = [
             systemInstruction,
