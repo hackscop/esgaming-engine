@@ -1,0 +1,29 @@
+[
+  {
+    "shop_id": "phoneplace",
+    "name": "Samsung Galaxy S26 Ultra",
+    "category": "Smartphone",
+    "price": "215,000 KES",
+    "specs": "512GB Storage, 12GB RAM, Titanium Black, 200MP Camera, 5G Network",
+    "in_stock": true,
+    "warranty": "2-Year Authorized Samsung Warranty"
+  },
+  {
+    "shop_id": "phoneplace",
+    "name": "iPhone 17 Pro Max",
+    "category": "Smartphone",
+    "price": "245,000 KES",
+    "specs": "256GB Storage, Desert Titanium, Pro Camera System, 5G Network",
+    "in_stock": true,
+    "warranty": "1-Year Apple International Warranty"
+  },
+  {
+    "shop_id": "phoneplace",
+    "name": "Samsung Galaxy A57",
+    "category": "Smartphone",
+    "price": "55,000 KES",
+    "specs": "128GB Storage, 8GB RAM, Awesome Navy, 50MP Main Camera",
+    "in_stock": true,
+    "warranty": "2-Year Authorized Samsung Warranty"
+  }
+]
