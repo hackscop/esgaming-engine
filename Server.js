@@ -1,98 +1,63 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
 const fs = require('fs');
-const mongoose = require('mongoose');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { GoogleGenAI } = require('@google/genai');
 
 const app = express();
-const PORT = process.env.PORT || 10000; 
+// Crucial: Increase the limit to handle the large base64 image strings
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
+app.use(cors());
 
-// 1. ACTIVATE CORS (Universal Widget Pass)
-app.use(cors()); 
-
-app.use(express.json());
-// ==========================================
-// HEALTH CHECK ROUTE FOR UPTIMEROBOT
-// ==========================================
-app.get('/', (req, res) => {
-    res.status(200).send('ESG Engine is live and running.');
-});
-
-app.use(express.static(__dirname));
-
-// 2. DATABASE CONFIGURATION
-mongoose.connect(process.env.MONGODB_URI)
-    .then(() => console.log("✅ MongoDB Connected Successfully"))
-    .catch(err => console.error("❌ MongoDB Error:", err));
-
-// UPDATED SCHEMA: 'store' added to track which client generated the chat
-const chatSchema = new mongoose.Schema({ 
-    user: String, 
-    ai: String,
-    store: String 
-});
-const ChatLog = mongoose.model('ChatLog', chatSchema);
-
-// 3. AI CONFIGURATION
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
-
-// 4. CORE ROUTES
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
+// Initialize the Google Gen AI client with your key
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 app.post('/api/chat', async (req, res) => {
     try {
-        const userMessage = req.body.prompt;
-        const shopId = req.body.shopId || 'default'; // Dynamically catches the client ID
+        const { prompt, shopId, image } = req.body;
         
-        if (!userMessage) return res.status(400).json({ error: "Prompt is required" });
-
-        // DYNAMIC INVENTORY ROUTER
-        let rawInventory = "Inventory data unavailable.";
-        try {
-            const filePath = path.join(__dirname, `${shopId}_inventory.json`);
-            if (fs.existsSync(filePath)) {
-                rawInventory = fs.readFileSync(filePath, 'utf8');
-            } else {
-                console.log(`Warning: No inventory file found for ${shopId}`);
-            }
-        } catch (e) { 
-            console.error("File Read Error", e); 
-        }
-        
-        // THE PAYLOAD
-        const prompt = `You are the primary AI sales architect for a store. Answer the user based ONLY on this current store inventory. Remember that custom build storage and RAM prices are currently highly volatile due to the global storage crisis, so price estimates should reflect that reality.
-        STORE DATA: ${rawInventory}
-        USER'S MESSAGE: "${userMessage}"`;
-
-        const result = await model.generateContent(prompt);
-        const responseText = result.response.text();
-
-        // SAVE LOG TO MONGODB (Now tracks the specific client)
-        try { 
-            await new ChatLog({ 
-                user: userMessage, 
-                ai: responseText, 
-                store: shopId 
-            }).save(); 
-        } catch (e) {
-            console.error("Database Log Error:", e);
+        // 1. DYNAMIC INVENTORY RESOLUTION
+        let inventoryData = "No inventory available.";
+        const inventoryPath = `./${shopId}_inventory.json`;
+        if (fs.existsSync(inventoryPath)) {
+            inventoryData = fs.readFileSync(inventoryPath, 'utf8');
         }
 
-        res.json({ response: responseText });
+        // 2. CONSTRUCT SYSTEM INSTRUCTIONS
+        const systemInstruction = `You are an expert sales assistant. Match users with the perfect item using this stock list: ${inventoryData}. If the user provides an image, look at it carefully, identify what it is, and check if we have it or a direct alternative in stock. Be brief and highly professional.`;
+
+        // 3. ASSEMBLE MULTIMODAL CONTENT ARRAY
+        let contentParts = [
+            systemInstruction,
+            `User Message: ${prompt}`
+        ];
+
+        // If an image payload was sent from the paperclip, inject its binary pixels
+        if (image && image.base64 && image.mimeType) {
+            contentParts.push({
+                inlineData: {
+                    data: image.base64,
+                    mimeType: image.mimeType
+                }
+            });
+        }
+
+        // 4. EXECUTE GEMINI GENERATION
+        const response = await ai.models.generateContent({
+            model: 'gemini-1.5-flash',
+            contents: contentParts,
+        });
+
+        res.json({ response: response.text });
+
     } catch (error) {
-        console.error("🔥 FATAL ENGINE ERROR:", error);
-        res.status(500).json({ error: "Engine failed to process the request." });
+        console.error('Server Engine Error:', error);
+        res.status(500).json({ error: 'System offline or processing error.' });
     }
 });
 
-// 5. SERVER INITIALIZATION
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`==========================================`);
-    console.log(`MULTI-TENANT SERVER RUNNING - V-1000`);
-    console.log(`==========================================`);
+    console.log(`AI Platform live on port ${PORT}`);
 });
