@@ -2,13 +2,14 @@
     const scriptTag = document.getElementById('es-ai-widget');
     const shopId = scriptTag ? scriptTag.getAttribute('data-shop-id') : 'default';
     const shopName = scriptTag ? scriptTag.getAttribute('data-shop-name') : 'AI Assistant';
+    const primaryColor = scriptTag ? scriptTag.getAttribute('data-primary-color') || '#cc0000' : '#cc0000';
 
     // 1. ADVANCED RESPONSIVE CSS & FULL-SCREEN MOBILE
     const style = document.createElement('style');
     style.innerHTML = `
         #es-widget-btn {
             position: fixed; bottom: 20px; right: 20px;
-            background: #cc0000; color: white; border: none;
+            background: ${primaryColor}; color: white; border: none;
             border-radius: 50%; width: 60px; height: 60px;
             font-size: 24px; cursor: pointer; z-index: 999999;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: 0.3s;
@@ -18,7 +19,7 @@
         #es-chat-window {
             position: fixed; bottom: 90px; right: 20px;
             width: 350px; height: 500px; background: #000000;
-            border: 1px solid #cc0000; border-radius: 10px;
+            border: 1px solid ${primaryColor}; border-radius: 10px;
             display: none; flex-direction: column; z-index: 999999;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -36,7 +37,7 @@
         }
 
         #es-chat-header {
-            background: #000000; color: #cc0000; border-bottom: 1px solid #cc0000; padding: 15px;
+            background: #000000; color: ${primaryColor}; border-bottom: 1px solid ${primaryColor}; padding: 15px;
             font-weight: bold; text-align: center; letter-spacing: 1px;
             display: flex; justify-content: space-between; align-items: center;
         }
@@ -55,12 +56,12 @@
             background: #1a1a2e; color: white; outline: none; font-size: 16px; /* Prevents iOS zoom */
         }
         #es-chat-send {
-            background: #cc0000; color: white; border: none; font-weight: bold;
+            background: ${primaryColor}; color: white; border: none; font-weight: bold;
             padding: 0 15px; margin-left: 10px; border-radius: 5px; cursor: pointer;
         }
-        .es-msg-user { align-self: flex-end; background: #cc0000; color: white; padding: 10px 14px; border-radius: 15px 15px 0 15px; font-size: 14px; max-width: 85%; }
+        .es-msg-user { align-self: flex-end; background: ${primaryColor}; color: white; padding: 10px 14px; border-radius: 15px 15px 0 15px; font-size: 14px; max-width: 85%; }
         .es-msg-ai { align-self: flex-start; background: #ffffff; color: #000000; padding: 10px 14px; border-radius: 15px 15px 15px 0; font-size: 14px; max-width: 85%; line-height: 1.5; }
-        .es-msg-ai strong { color: #cc0000; } /* Makes bold text pop */
+        .es-msg-ai strong { color: ${primaryColor} } /* Makes bold text pop */
     `;
     document.head.appendChild(style);
 
